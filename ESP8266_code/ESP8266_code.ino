@@ -16,6 +16,7 @@ bool Relay = 0;
 float duration;
 float distance;
 float value;
+float fill_percentage;
 
 // WiFi credentials
 const char WIFI_SSID[] = "DESKTOP-DCI13GV 0351";
@@ -161,11 +162,13 @@ void publishWaterLevel() {
   Serial.print("WaterLevel:");
   Serial.print(distance);
   Serial.println(" ");
+  Serial.print(fill_percentage);
+  Serial.println(" ");
 
   // Create JSON document for message
   StaticJsonDocument<200> doc;
   doc["Time"] = time(nullptr);
-  doc["Water level"] = distance;
+  doc["Water level"] = fill_percentage;
 
   // Serialize JSON document to string
   char jsonBuffer[200];
@@ -227,13 +230,19 @@ void loop() {
     // Calculating the distance
     distance = duration * 0.034 / 2;
 
-    if (distance < 2) {
+    if (distance < 1.5) {
     distance = 0; // Replace invalid readings with 0
   }
     // Prints the distance on the Serial Monitor
     Serial.print("Distance: ");
     Serial.println(distance);
 
+    if (distance > 12) {
+    distance = 12; // Replace invalid readings with 0
+  }
+    // Calcul procentaj umplere
+    fill_percentage = map(distance, 0, 12, 100, 0);
+    Serial.println(fill_percentage);
     if (client.connected()) {
       // Publish message
        publishSoilMoisture();
