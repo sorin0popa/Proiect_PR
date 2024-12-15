@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senzori Umiditate și Nivel Rezervor</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <h1>Monitorizare Umiditate și Rezervor</h1>
+    <div class="sensor-data">
+        <h2>Umiditate Sol: <span id="soil-moisture">Se incarca...</span></h2>
+        <h2>Nivel Rezervor: <span id="water-level">Se incarca...</span></h2>
+    </div>
+    <div class="controls">
+        <button onclick="controlPump('start_pump')">Pornește Pompa</button>
+        <button onclick="controlPump('stop_pump')">Oprește Pompa</button>
+    </div>
+    <div class="pump_info">
+        <h3> <span id="pump_info">Starea pompei: Se incarca...</h3>
+        <h3> <span id="last_checked">Ultima actualizare: Se incarca...</h3>
+    </div>
+    <script>
+        function controlPump(action) {
+            fetch('/api/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.pump_state === 'on') {
+                    document.getElementById("pump_info").innerText = 'Starea pompei: Se incearca activarea...';
+            } else {
+                document.getElementById("pump_info").innerText = 'Starea pompei: Se incearca oprirea...';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            if (action === 'start_pump') {
+                alert("Pump start request...");
+            } else {
+                alert("Pump stop request...");
+                }
+        }
+
+        // Actualizează valorile senzorilor la fiecare 5 secunde
+        setInterval(() => {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("soil-moisture").innerText = `${data.soil_moisture}%`;
+                    document.getElementById("water-level").innerText = `${data.water_level}%`;
+                    // document.getElementById("pump_info").innerText = `${data.pump_state}`;
+                    if (data.pump_state === 'on') {
+                        document.getElementById("pump_info").innerText = 'Starea pompei: Pornită';
+                    } else {
+                        document.getElementById("pump_info").innerText = 'Starea pompei: Oprită';
+                    }
+                    document.getElementById("last_checked").innerText = `${data.last_checked}`;
+                })
+                .catch(error => console.error('Error:', error));
+        }, 5000);
+    </script>
+</body>
+</html>

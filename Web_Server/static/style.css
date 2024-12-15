@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color:#F7FAFD;
+}
+
+h1 {
+    color: #333;
+}
+
+.sensor-data h2 {
+    margin: 20px 0;
+    color: #555;
+}
+
+.pump_info h3{
+    text-align: center;
+    color: #ae610d;
+}
+
+.controls button {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #4CAF50;
+    color:  white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.controls button:hover {
+    background-color: #45a049;
+}
