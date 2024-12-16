@@ -31,3 +31,74 @@ h1 {
 .controls button:hover {
     background-color: #45a049;
 }
+
+/* Container principal pentru dreptunghiuri */
+.rectangleContainer {
+    display: flex; /* Setează containerul ca fiind flexibil */
+    justify-content: space-between; /* Adaugă spațiu între dreptunghiuri */
+    gap: 20px; /* Spațiu între dreptunghiuri */
+    max-width: 700px; /* Limitează lățimea totală */
+    margin: 50px auto; /* Adaugă un spațiu de sus și centrează containerul */
+}
+
+/* Containerul dreptunghiului pentru apă */
+.waterRectangle {
+    width: 45%; /* Lățimea fiecărui dreptunghi, 45% din container */
+    height: 300px; /* Înălțimea dreptunghiului */
+    position:relative;
+    border: 2px solid black; /* Conturul dreptunghiului */
+    background-color: #f0f0f0; /* Fundalul dreptunghiului */
+    overflow: hidden;
+}
+
+/* Bară de umplere pentru apă */
+.waterFill {
+    width: 100%; /* Umple pe lățime */
+    background-color: #007bff; /* Culoarea umplerii */
+    height: 50%; /* Procentajul de umplere */
+    position: absolute;
+    bottom: 0; /* Pornește de jos */
+    transition: height 0.5s ease; /* Tranziție lină */
+}
+
+/* Textul procentajului pentru apă */
+.waterPercentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-size: 16px;
+    color: black;
+}
+
+/* Containerul dreptunghiului pentru pământ */
+.soilRectangle {
+    width: 45%; /* Lățimea fiecărui dreptunghi, 45% din container */
+    height: 300px; /* Înălțimea dreptunghiului */
+    border: 2px solid black; /* Conturul dreptunghiului */
+    position:relative;
+    background-color: #f0f0f0; /* Fundalul dreptunghiului */
+    overflow: hidden;
+}
+
+/* Bară de umplere pentru pământ */
+.soilFill {
+    width: 100%; /* Umple pe lățime */
+    background-color: #973e03; /* Culoarea umplerii */
+    height: 50%; /* Procentajul de umplere */
+    position: absolute;
+    bottom: 0; /* Pornește de jos */
+    transition: height 0.5s ease; /* Tranziție lină */
+}
+
+/* Textul procentajului pentru pământ */
+.soilPercentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    font-size: 16px;
+    color: black;
+}

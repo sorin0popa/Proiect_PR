@@ -5,8 +5,6 @@
 #include "env.h"
 
 
-bool Relay = 0;
-
 //Define component pins
 #define sensor A0
 #define waterPump D3
@@ -31,6 +29,7 @@ const char MQTT_HOST[] = "a132pc9bxacqas-ats.iot.us-east-1.amazonaws.com";
 // MQTT topics
 const char AWS_IOT_PUBLISH_TOPIC1[] = "esp8266/umiditate_sol";
 const char AWS_IOT_PUBLISH_TOPIC2[] = "esp8266/nivel_apa";
+const char AWS_IOT_PUBLISH_TOPIC3[] = "esp8266/stare_pompa";
 const char AWS_IOT_SUBSCRIBE_TOPIC[] = "web_server/command";
 
 // Publishing interval
@@ -85,11 +84,13 @@ void messageReceived(char *topic, byte *payload, unsigned int length) {
   { 
     Serial.println("se opreste");
     digitalWrite(waterPump, HIGH); // e pe off
+
   }
   else if (payload[0] == '1')
   {
     Serial.println("se porneste");
     digitalWrite(waterPump, LOW); // e pe on
+    Serial.print(waterPump);
   }
 }
 
@@ -178,6 +179,27 @@ void publishWaterLevel() {
   client.publish(AWS_IOT_PUBLISH_TOPIC2, jsonBuffer);
 }
 
+// Function to publish message to AWS IoT Core
+void publishPumpState() {
+  Serial.print("PumpInfo:");
+  Serial.println(" ");
+  int waterPump = 1 - digitalRead(waterPump); // Citește starea pinului D3
+
+  Serial.print("Starea pompei: ");
+  Serial.println(waterPump); // Afișează starea
+  // Create JSON document for message
+  StaticJsonDocument<200> doc;
+  doc["Time"] = time(nullptr);
+  doc["Pump state"] = 1 - digitalRead(waterPump);
+
+  // Serialize JSON document to string
+  char jsonBuffer[200];
+  serializeJson(doc, jsonBuffer);
+
+  // Publish message to MQTT topic
+  client.publish(AWS_IOT_PUBLISH_TOPIC2, jsonBuffer);
+}
+
 void setup() {
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
@@ -247,6 +269,7 @@ void loop() {
       // Publish message
        publishSoilMoisture();
        publishWaterLevel();
+       publishPumpState();
     }
     
   }

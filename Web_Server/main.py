@@ -36,6 +36,7 @@ CLIENT_CERT = "../AWS_IOT_Certificates/certificate.pem.crt"
 PRIVATE_KEY = "../AWS_IOT_Certificates/private.pem.key"
 SUBSCRIBE_TOPIC_1 = "esp8266/umiditate_sol"
 SUBSCRIBE_TOPIC_2 = "esp8266/nivel_apa"
+SUBSCRIBE_TOPIC_3 = "esp8266/stare_pompa"
 PUBLISH_TOPIC = "web_server/command"
 MESSAGE = "Hello, World!"
 PORT=8883
@@ -87,8 +88,8 @@ def on_resubscribe_complete(resubscribe_future):
 def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     global soil_moisture
     global water_level
-    global time
     global last_checked
+    global pump_state
 
     global received_count
     
@@ -105,7 +106,7 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     
     if 'Time' in data:
         last_checked = data['Time']
-
+    
         # Convert timestamp to datetime object (GMT)
         gmt_time = datetime.utcfromtimestamp(last_checked)
 
@@ -123,6 +124,12 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
 
         # Format the time in GMT+2
         last_checked = gmt_plus_2_time.strftime('%Y-%m-%d %H:%M:%S')
+    
+    if 'Pump state' in data:
+        if data['Pump state'] == 1:
+            pump_state = 'on'
+        else:
+            pump_state = 'off'  
     
 
 # Callback when the connection successfully connects
@@ -164,13 +171,15 @@ def publish(message, topic):
 @app.route("/")
 def index():
     
-    return render_template("index.html", soil_moisture=soil_moisture, water_level=water_level, pump_info=pump_state,
+    return render_template("index.html", soil_moisture=soil_moisture, water_level=water_level, pump_state=pump_state,
                             last_checked=last_checked)
 
 
 # Ruta pentru control manual (ex. pornire pompa)
 @app.route("/api/control", methods=["POST"])
 def control_pump():
+    global pump_state
+    
     action = request.json.get("action")
     if action == "start_pump":
         message = "1"
@@ -194,7 +203,7 @@ def control_pump():
 @app.route("/api/data", methods=["GET"])
 def get_current_data():
     global last_checked
-    
+    print(f"PUMP STATE {pump_state}")
     return jsonify({"soil_moisture": soil_moisture, "water_level": water_level,
                     "pump_state": pump_state, "last_checked": last_checked},
                    ), 200
