@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:9000
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: my-org
+      defaultBucket: my-bucket
+      tlsSkipVerify: true
+    secureJsonData:
+      token: token
+
+# Source:https://grafana.com/docs/grafana/latest/datasources/influxdb/configure-influxdb-data-source/

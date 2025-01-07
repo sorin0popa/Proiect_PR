@@ -14,6 +14,8 @@ from datetime import datetime
 
 from awscrt import mqtt, http
 from awsiot import mqtt_connection_builder
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import SYNCHRONOUS
 import sys
 import threading
 import time
@@ -41,10 +43,20 @@ PUBLISH_TOPIC = "web_server/command"
 MESSAGE = "Hello, World!"
 PORT=8883
 
+# InfluxDB details
+BUCKET = "my-bucket"
+ORGANIZATION = "my-org"
+TOKEN = "token"
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+# Connecting to influxDB
+client = InfluxDBClient(url="http://localhost:9000", token=TOKEN, org=ORGANIZATION)
+
+write_api = client.write_api(write_options=SYNCHRONOUS)
+query_api = client.query_api()
 
 input_count=10
 
@@ -252,6 +264,19 @@ if __name__ == '__main__':
     
     app.run(host="0.0.0.0", port=6000, debug=True)
     
+    db_data = [{
+            "measurement": f'{"ESP8266"}.{"nivel_apa"}',
+            "tags": {
+                "location": "UPB",
+                "station": "ESP8266"
+            },
+            "fields": {
+                "value": float(20)
+            },
+            "timestamp": "2025-10-10"
+        }]
+    
+    write_api.write(BUCKET, ORGANIZATION, db_data)
     
     # Publish message to server desired number of times.
     # This step is skipped if message is blank.

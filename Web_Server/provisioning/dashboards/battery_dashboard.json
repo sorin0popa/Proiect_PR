@@ -1,0 +1,246 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "RPi_1"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 2,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /BAT/) \n  |> keep(columns: [\"_time\", \"_value\", \"_measurement\", \"station\"])\n  |> aggregateWindow(every: 1s, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")\n ",
+          "refId": "A"
+        }
+      ],
+      "title": "Evolutia Incarcarii Bateriilor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 2,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Avg {_start_avg_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_current_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_min_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_second_join=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _stop_avg_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_current_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_min_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_second_join=\"2025-01-05 18:35:47.0678941 +0000 UTC\", station=\"RPi_1\"}"
+          }
+        ]
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "query": "current_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /BAT/) \n  |> group(columns: [\"_measurement\", \"station\"])\n  |> last()\n  |> rename(columns: {\"_value\": \"Current\"})\n\nmin_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /BAT/) \n  |> group(columns: [\"_measurement\", \"station\"])\n  |> min()\n  |> rename(columns: {\"_value\": \"Min\"})\n\nmax_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /BAT/) \n  |> group(columns: [\"_measurement\", \"station\"])\n  |> max()\n  |> rename(columns: {\"_value\": \"Max\"})\n\navg_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /BAT/) \n  |> group(columns: [\"_measurement\", \"station\"])\n  |> mean()\n  |> rename(columns: {\"_value\": \"Avg\"})\n\nfirst_join = join(\n  tables: {current_value, min_value},\n  on: [\"_measurement\", \"station\"],\n  method: \"inner\"\n)\n \nsecond_join = join(\n  tables: {first_join, max_value},\n  on: [\"_measurement\", \"station\"],\n  method: \"inner\"\n)\n\nthird_join = join(\n  tables: {second_join, avg_value},\n  on: [\"_measurement\", \"station\"],\n  method: \"inner\"\n)\n\n\nresult = third_join\n  |> map(fn: (r) => ({\n    r with\n    Metric: r.station\n  }))\n\nfinal_result = result\n  |> keep(columns: [\"Metric\",\"Current\", \"Min\", \"Max\", \"Avg\"])\n  |> yield(name: \"final_result\")\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Statistic Aggregation",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {
+              "Avg": 4,
+              "Current": 1,
+              "Max": 3,
+              "Metric": 0,
+              "Min": 2
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "30m",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-48h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Battery Dashboard",
+  "uid": "ce93hyfkugc8wb",
+  "version": 6,
+  "weekStart": ""
+}
