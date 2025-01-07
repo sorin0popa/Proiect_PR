@@ -1,0 +1,65 @@
+services:
+  influxdb:
+    image: influxdb:2
+    container_name: influxdb
+    ports:
+      - "9000:9000"
+    networks:
+      - db_network
+      - grafana_network
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: password
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: token
+      DOCKER_INFLUXDB_INIT_ORG: my-org
+      DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    restart: unless-stopped
+
+  web_page:
+    image: web_page
+    container_name: web_page
+    build: 
+      context:
+        ./web_page_code
+    depends_on:
+      - influxdb
+    environment:
+      - DEBUG_DATA_FLOW=True
+    networks:
+      - mqtt_network
+      - db_network
+    restart: unless-stopped
+    command: ["python3", "-u", "main.py"]
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+    ports:
+       - '6000:6000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    networks:
+      - grafana_network
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+  
+  # https://grafana.com/docs/grafana/latest/datasources/influxdb/configure-influxdb-data-source/
+
+
+# volumes for mapping data,config and log
+volumes:
+  influxdb-data:
+  grafana-data:
+
+networks:
+  mqtt_network:
+  db_network:
+  grafana_network:

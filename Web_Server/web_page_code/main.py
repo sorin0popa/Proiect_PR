@@ -31,9 +31,9 @@ import json
 
 ENDPOINT = "a132pc9bxacqas-ats.iot.us-east-1.amazonaws.com"
 CLIENT_ID = "iotconsole-6280dc9c-9c8a-444d-a341-0d725b294922"
-CA_CERT ="../AWS_IOT_Certificates/amazon_root_ca1.pem"
-CLIENT_CERT = "../AWS_IOT_Certificates/certificate.pem.crt"
-PRIVATE_KEY = "../AWS_IOT_Certificates/private.pem.key"
+CA_CERT ="./AWS_IOT_Certificates/amazon_root_ca1.pem"
+CLIENT_CERT = "./AWS_IOT_Certificates/certificate.pem.crt"
+PRIVATE_KEY = "./AWS_IOT_Certificates/private.pem.key"
 SUBSCRIBE_TOPIC_1 = "esp8266/umiditate_sol"
 SUBSCRIBE_TOPIC_2 = "esp8266/nivel_apa"
 SUBSCRIBE_TOPIC_3 = "esp8266/stare_pompa"

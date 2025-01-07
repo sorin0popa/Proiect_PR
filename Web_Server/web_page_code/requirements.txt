@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+pytz
+awscrt
+awsiotsdk
+influxdb_client
