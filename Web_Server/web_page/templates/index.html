@@ -31,7 +31,13 @@
         </div>
     </div>
     <h1>Vizualizare Grafana</h1>
-    <iframe src="http://localhost:3000/public-dashboards/fa1f038b53d54d4bb15031a041735cce" width="450" height="200" frameborder="0"></iframe>
+    <div class="iframe-container">
+        <iframe src="http://localhost:3000/public-dashboards/fa1f038b53d54d4bb15031a041735cce" title = "Iframe 1"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/fa1f038b53d54d4bb15031a041735cce" title = "Iframe 2"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/fa1f038b53d54d4bb15031a041735cce" title = "Iframe 3"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/fa1f038b53d54d4bb15031a041735cce" title = "Iframe 4"></iframe>
+    </div>
+
     <script>
         function controlPump(action) {
             fetch('/api/control', {

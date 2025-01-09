@@ -33,9 +33,9 @@ import json
 
 ENDPOINT = "a132pc9bxacqas-ats.iot.us-east-1.amazonaws.com"
 CLIENT_ID = "iotconsole-6280dc9c-9c8a-444d-a341-0d725b294922"
-CA_CERT ="./AWS_IOT_Certificates/amazon_root_ca1.pem"
-CLIENT_CERT = "./AWS_IOT_Certificates/certificate.pem.crt"
-PRIVATE_KEY = "./AWS_IOT_Certificates/private.pem.key"
+CA_CERT ="../../AWS_IOT_Certificates/amazon_root_ca1.pem"
+CLIENT_CERT = "../../AWS_IOT_Certificates/certificate.pem.crt"
+PRIVATE_KEY = "../../AWS_IOT_Certificates/private.pem.key"
 SUBSCRIBE_TOPIC_1 = "esp8266/umiditate_sol"
 SUBSCRIBE_TOPIC_2 = "esp8266/nivel_apa"
 SUBSCRIBE_TOPIC_3 = "esp8266/stare_pompa"
@@ -53,7 +53,7 @@ app = Flask(__name__)
 
 
 # Connecting to influxDB
-client = InfluxDBClient(url="http://localhost:9000", token=TOKEN, org=ORGANIZATION)
+client = InfluxDBClient(url="http://localhost:8086", token=TOKEN, org=ORGANIZATION)
 
 write_api = client.write_api(write_options=SYNCHRONOUS)
 query_api = client.query_api()
@@ -71,12 +71,13 @@ publish_count=0
 
 # Callback when connection is accidentally lost.
 def on_connection_interrupted(connection, error, **kwargs):
-    print("Connection interrupted. error: {}".format(error))
+    pass
+    # print("Connection interrupted. error: {}".format(error))
 
 
 # Callback when an interrupted connection is re-established.
 def on_connection_resumed(connection, return_code, session_present, **kwargs):
-    print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
+    # print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
     if return_code == mqtt.ConnectReturnCode.ACCEPTED and not session_present:
         print("Session did not persist. Resubscribing to existing topics...")
@@ -105,16 +106,24 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
 
     global received_count
     
+    
     print("Received message from topic '{}': {}".format(topic, payload))
+    
+    station = topic.split('/')[0]
+    key = topic.split('/')[1]
+    value = ""
+    
     received_count += 1
     
     data = json.loads(payload)
     
     if 'Soil moisture humidity' in data:
         soil_moisture = data['Soil moisture humidity']
+        value = float(soil_moisture)
 
     if 'Water level' in data:
         water_level = data['Water level']
+        value = float(water_level)
     
     if 'Time' in data:
         last_checked = data['Time']
@@ -140,14 +149,33 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     if 'Pump state' in data:
         if data['Pump state'] == 1:
             pump_state = 'on'
+            value = float(1)
         else:
-            pump_state = 'off'  
+            pump_state = 'off'
+            value = float(0)
+            
+    db_data = [{
+            "measurement": f'{station}.{key}',
+            "tags": {
+                "station": station
+            },
+            "fields": {
+                "value": 0 # float(value)
+            },
+            "timestamp": last_checked
+        }]
+    
+    print(f"se adauga {db_data}")
+    
+    write_api.write(BUCKET, ORGANIZATION, db_data)
+
     
 
 # Callback when the connection successfully connects
 def on_connection_success(connection, callback_data):
-    assert isinstance(callback_data, mqtt.OnConnectionSuccessData)
-    print("Connection Successful with return code: {} session present: {}".format(callback_data.return_code, callback_data.session_present))
+    pass
+    # assert isinstance(callback_data, mqtt.OnConnectionSuccessData)
+    # print("Connection Successful with return code: {} session present: {}".format(callback_data.return_code, callback_data.session_present))
 
 # Callback when a connection attempt fails
 def on_connection_failure(connection, callback_data):
@@ -239,7 +267,7 @@ if __name__ == '__main__':
         on_connection_resumed=on_connection_resumed,
         client_id=CLIENT_ID,
         clean_session=False,
-        keep_alive_secs=30,
+        keep_alive_secs=60,
         http_proxy_options=proxy_options,
         on_connection_success=on_connection_success,
         on_connection_failure=on_connection_failure,
@@ -264,19 +292,6 @@ if __name__ == '__main__':
     
     app.run(host="0.0.0.0", port=6000, debug=True)
     
-    db_data = [{
-            "measurement": f'{"ESP8266"}.{"nivel_apa"}',
-            "tags": {
-                "location": "UPB",
-                "station": "ESP8266"
-            },
-            "fields": {
-                "value": float(20)
-            },
-            "timestamp": "2025-10-10"
-        }]
-    
-    write_api.write(BUCKET, ORGANIZATION, db_data)
     
     # Publish message to server desired number of times.
     # This step is skipped if message is blank.

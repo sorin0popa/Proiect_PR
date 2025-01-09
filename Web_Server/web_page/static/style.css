@@ -102,3 +102,18 @@ h1 {
     font-size: 16px;
     color: black;
 }
+
+/* Containerul care va organiza iframe-urile pe o matrice 2x2 */
+.iframe-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 coloane, fiecare având lățimea egală */
+    grid-gap: 8px;
+    width: 100%;
+    height: 100vh;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
