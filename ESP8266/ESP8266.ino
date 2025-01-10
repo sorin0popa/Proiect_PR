@@ -17,8 +17,12 @@ float value;
 float fill_percentage;
 
 // WiFi credentials
-const char WIFI_SSID[] = "DESKTOP-DCI13GV 0351";
-const char WIFI_PASSWORD[] = "B870d|65";
+// const char WIFI_SSID[] = "DESKTOP-DCI13GV 0351";
+// const char WIFI_PASSWORD[] = "B870d|65";
+
+const char WIFI_SSID[] = "Nimic's A55";
+const char WIFI_PASSWORD[] = "alex1111";
+
 
 // Device name from AWS
 const char THINGNAME[] = "PR_project";
@@ -27,16 +31,16 @@ const char THINGNAME[] = "PR_project";
 const char MQTT_HOST[] = "a132pc9bxacqas-ats.iot.us-east-1.amazonaws.com";
 
 // MQTT topics
-const char AWS_IOT_PUBLISH_TOPIC1[] = "esp8266/umiditate_sol";
-const char AWS_IOT_PUBLISH_TOPIC2[] = "esp8266/nivel_apa";
-const char AWS_IOT_PUBLISH_TOPIC3[] = "esp8266/stare_pompa";
+const char AWS_IOT_PUBLISH_TOPIC1[] = "ESP8266/umiditate_sol";
+const char AWS_IOT_PUBLISH_TOPIC2[] = "ESP8266/nivel_apa";
+const char AWS_IOT_PUBLISH_TOPIC3[] = "ESP8266/stare_pompa";
 const char AWS_IOT_SUBSCRIBE_TOPIC[] = "web_server/command";
 
 // Publishing interval
-const long interval = 5000;
+long interval = 5000;
 
 // Timezone offset from UTC
-const int8_t TIME_ZONE = -5;
+const int8_t TIME_ZONE = +2;
 
 // Last time message was sent
 unsigned long lastMillis = 0;
@@ -61,13 +65,23 @@ void NTPConnect() {
   // Set time using SNTP
   Serial.print("Setting time using SNTP");
   configTime(TIME_ZONE * 3600, 0, "pool.ntp.org", "time.nist.gov");
-  time_t now = time(nullptr);
-  while (now < 1510592825) { // January 13, 2018
-    delay(500);
-    Serial.print(".");
-    now = time(nullptr);
-  }
   Serial.println("done!");
+}
+
+char *getFormattedTime() {
+  char* timeStr = (char*)malloc(30 * sizeof(char)); 
+
+  struct tm timeinfo;
+  if (getLocalTime(&timeinfo)) {
+    strftime(timeStr, 30, "%Y-%m-%d %H:%M:%S", &timeinfo);
+    return timeStr;
+  }
+  else {
+  time_t now = time(nullptr);
+  struct tm* timeinfo = localtime(&now);
+  strftime(timeStr, 30, "%Y-%m-%d %H:%M:%S", timeinfo);
+  return timeStr;
+  }
 }
 
 // Callback function for message reception
@@ -82,12 +96,14 @@ void messageReceived(char *topic, byte *payload, unsigned int length) {
 
   if (payload[0] == '0')
   { 
+    interval = 5000;
     Serial.println("se opreste");
     digitalWrite(waterPump, HIGH); // e pe off
 
   }
   else if (payload[0] == '1')
   {
+    interval = 10;
     Serial.println("se porneste");
     digitalWrite(waterPump, LOW); // e pe on
     Serial.print(waterPump);
@@ -146,8 +162,11 @@ void publishSoilMoisture() {
   Serial.println(" ");
 
   // Create JSON document for message
+  char *time = getFormattedTime();
   StaticJsonDocument<200> doc;
-  doc["Time"] = time(nullptr);
+  doc["Time"] = getFormattedTime();
+  Serial.print("Time: ");
+  Serial.println(time);
   doc["Soil moisture humidity"] = value;
 
   // Serialize JSON document to string
@@ -168,7 +187,7 @@ void publishWaterLevel() {
 
   // Create JSON document for message
   StaticJsonDocument<200> doc;
-  doc["Time"] = time(nullptr);
+  doc["Time"] = getFormattedTime();
   doc["Water level"] = fill_percentage;
 
   // Serialize JSON document to string
@@ -181,15 +200,14 @@ void publishWaterLevel() {
 
 // Function to publish message to AWS IoT Core
 void publishPumpState() {
-  Serial.print("PumpInfo:");
-  Serial.println(" ");
   int waterPump = 1 - digitalRead(waterPump); // Citește starea pinului D3
 
   Serial.print("Starea pompei: ");
   Serial.println(waterPump); // Afișează starea
+
   // Create JSON document for message
   StaticJsonDocument<200> doc;
-  doc["Time"] = time(nullptr);
+  doc["Time"] = getFormattedTime();
   doc["Pump state"] = 1 - digitalRead(waterPump);
 
   // Serialize JSON document to string
@@ -197,7 +215,7 @@ void publishPumpState() {
   serializeJson(doc, jsonBuffer);
 
   // Publish message to MQTT topic
-  client.publish(AWS_IOT_PUBLISH_TOPIC2, jsonBuffer);
+  client.publish(AWS_IOT_PUBLISH_TOPIC3, jsonBuffer);
 }
 
 void setup() {

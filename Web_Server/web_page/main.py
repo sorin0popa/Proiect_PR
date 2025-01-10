@@ -36,9 +36,9 @@ CLIENT_ID = "iotconsole-6280dc9c-9c8a-444d-a341-0d725b294922"
 CA_CERT ="../../AWS_IOT_Certificates/amazon_root_ca1.pem"
 CLIENT_CERT = "../../AWS_IOT_Certificates/certificate.pem.crt"
 PRIVATE_KEY = "../../AWS_IOT_Certificates/private.pem.key"
-SUBSCRIBE_TOPIC_1 = "esp8266/umiditate_sol"
-SUBSCRIBE_TOPIC_2 = "esp8266/nivel_apa"
-SUBSCRIBE_TOPIC_3 = "esp8266/stare_pompa"
+SUBSCRIBE_TOPIC_1 = "ESP8266/umiditate_sol"
+SUBSCRIBE_TOPIC_2 = "ESP8266/nivel_apa"
+SUBSCRIBE_TOPIC_3 = "ESP8266/stare_pompa"
 PUBLISH_TOPIC = "web_server/command"
 MESSAGE = "Hello, World!"
 PORT=8883
@@ -111,7 +111,7 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     
     station = topic.split('/')[0]
     key = topic.split('/')[1]
-    value = ""
+    value = 0.0
     
     received_count += 1
     
@@ -119,55 +119,41 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     
     if 'Soil moisture humidity' in data:
         soil_moisture = data['Soil moisture humidity']
-        value = float(soil_moisture)
+        value = soil_moisture
 
     if 'Water level' in data:
         water_level = data['Water level']
-        value = float(water_level)
+        value = water_level
     
     if 'Time' in data:
         last_checked = data['Time']
     
-        # Convert timestamp to datetime object (GMT)
-        gmt_time = datetime.utcfromtimestamp(last_checked)
-
-        # Define the GMT timezone
-        gmt_tz = pytz.timezone('GMT')
-
-        # Attach the GMT timezone to the datetime object
-        gmt_time = gmt_tz.localize(gmt_time)
-
-        # Define the GMT+2 timezone
-        gmt_plus_2_tz = pytz.timezone('Etc/GMT-2')
-
-        # Convert to GMT+2 timezone
-        gmt_plus_2_time = gmt_time.astimezone(gmt_plus_2_tz)
-
-        # Format the time in GMT+2
-        last_checked = gmt_plus_2_time.strftime('%Y-%m-%d %H:%M:%S')
-    
     if 'Pump state' in data:
         if data['Pump state'] == 1:
             pump_state = 'on'
-            value = float(1)
+            value = 1
         else:
             pump_state = 'off'
-            value = float(0)
-            
-    db_data = [{
+            value = 0
+    
+    if isinstance(value, float) == True or isinstance(value, int) == True:
+        
+        db_data = [{
             "measurement": f'{station}.{key}',
             "tags": {
-                "station": station
+                "station": station,
+                "key": key
             },
             "fields": {
-                "value": 0 # float(value)
+                "value": float(value)
             },
             "timestamp": last_checked
         }]
     
-    print(f"se adauga {db_data}")
+        print(f"value={value}")
+        print(f"se adauga {db_data}")
     
-    write_api.write(BUCKET, ORGANIZATION, db_data)
+        write_api.write(BUCKET, ORGANIZATION, db_data)
 
     
 
@@ -288,6 +274,7 @@ if __name__ == '__main__':
     # Subscribe
     subscribe(SUBSCRIBE_TOPIC_1)
     subscribe(SUBSCRIBE_TOPIC_2)
+    subscribe(SUBSCRIBE_TOPIC_3)
 
     
     app.run(host="0.0.0.0", port=6000, debug=True)

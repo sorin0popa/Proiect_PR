@@ -14,8 +14,8 @@ services:
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: token
       DOCKER_INFLUXDB_INIT_ORG: my-org
       DOCKER_INFLUXDB_INIT_BUCKET: my-bucket
-    volumes:
-      - influxdb-data:/var/lib/influxdb2
+    #volumes:
+     # - influxdb-data:/var/lib/influxdb2
     restart: unless-stopped
 
   grafana:
@@ -35,16 +35,16 @@ services:
     networks:
       - grafana_network
     volumes:
-      - grafana-data:/var/lib/grafana
+      # - grafana-data:/var/lib/grafana
       - ./provisioning:/etc/grafana/provisioning
   
   # https://grafana.com/docs/grafana/latest/datasources/influxdb/configure-influxdb-data-source/
 
 
 # volumes for mapping data,config and log
-volumes:
-  influxdb-data:
-  grafana-data:
+# volumes:
+ #  influxdb-data:
+ #  grafana-data:
 
 networks:
   db_network:
