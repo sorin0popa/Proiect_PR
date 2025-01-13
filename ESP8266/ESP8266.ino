@@ -39,6 +39,8 @@ const char AWS_IOT_SUBSCRIBE_TOPIC[] = "web_server/command";
 // Publishing interval
 long interval = 5000;
 
+long low_interval = 1000;
+
 // Timezone offset from UTC
 const int8_t TIME_ZONE = +2;
 
@@ -86,27 +88,37 @@ char *getFormattedTime() {
 
 // Callback function for message reception
 void messageReceived(char *topic, byte *payload, unsigned int length) {
-  Serial.print("Received [");
-  Serial.print(topic);
-  Serial.print("]: ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
+ // Serial.print("Received [");
+ // Serial.print(topic);
+ // Serial.print("]: ");
+ // for (int i = 0; i < length; i++) {
+ //   Serial.print((char)payload[i]);
+ // }
+//  Serial.println();
 
   if (payload[0] == '0')
   { 
-    interval = 5000;
-    Serial.println("se opreste");
-    digitalWrite(waterPump, HIGH); // e pe off
+  Serial.println("se opreste");
+  String payload = "{\"Pump state\": 0}";
+  client.publish(AWS_IOT_PUBLISH_TOPIC3, payload.c_str());
 
+  delay(1000);
+  
+  digitalWrite(waterPump, HIGH); // e pe off
+  
+    
   }
   else if (payload[0] == '1')
   {
-    interval = 10;
     Serial.println("se porneste");
+    String payload = "{\"Pump state\": 1}";
+    client.publish(AWS_IOT_PUBLISH_TOPIC3, payload.c_str());
+
+    delay(1000);
+
     digitalWrite(waterPump, LOW); // e pe on
-    Serial.print(waterPump);
+  //  Serial.print(waterPump);
+  
   }
 }
 
@@ -157,16 +169,16 @@ void connectAWS() {
 
 // Function to publish message to AWS IoT Core
 void publishSoilMoisture() {
-  Serial.print("Moisture :");
-  Serial.print(value);
-  Serial.println(" ");
+//  Serial.print("Moisture :");
+//  Serial.print(value);
+//  Serial.println(" ");
 
   // Create JSON document for message
   char *time = getFormattedTime();
   StaticJsonDocument<200> doc;
   doc["Time"] = getFormattedTime();
-  Serial.print("Time: ");
-  Serial.println(time);
+//  Serial.print("Time: ");
+//  Serial.println(time);
   doc["Soil moisture humidity"] = value;
 
   // Serialize JSON document to string
@@ -179,11 +191,11 @@ void publishSoilMoisture() {
 
 // Function to publish message to AWS IoT Core
 void publishWaterLevel() {
-  Serial.print("WaterLevel:");
-  Serial.print(distance);
-  Serial.println(" ");
-  Serial.print(fill_percentage);
-  Serial.println(" ");
+//  Serial.print("WaterLevel:");
+//  Serial.print(distance);
+//  Serial.println(" ");
+//  Serial.print(fill_percentage);
+//  Serial.println(" ");
 
   // Create JSON document for message
   StaticJsonDocument<200> doc;
@@ -202,8 +214,8 @@ void publishWaterLevel() {
 void publishPumpState() {
   int waterPump = 1 - digitalRead(waterPump); // Citește starea pinului D3
 
-  Serial.print("Starea pompei: ");
-  Serial.println(waterPump); // Afișează starea
+//  Serial.print("Starea pompei: ");
+//  Serial.println(waterPump); // Afișează starea
 
   // Create JSON document for message
   StaticJsonDocument<200> doc;
@@ -235,22 +247,27 @@ void setup() {
 //Get the soil moisture values
 float soilMoistureSensor() {
   float value = analogRead(sensor);
-  Serial.print("[FUNC1] Moisture :");
-  Serial.print(value);
-  Serial.print(" ");
+//  Serial.print("[FUNC1] Moisture :");
+//  Serial.print(value);
+//  Serial.print(" ");
 
   value = map(value, 0, 1024, 0, 100);
   value = (value - 100) * -1;
 
-  Serial.print("[FUNC2] Moisture :");
-  Serial.print(value);
-  Serial.println(" ");
+//  Serial.print("[FUNC2] Moisture :");
+//  Serial.print(value);
+//  Serial.println(" ");
 
   return value;
 }
 
 
 void loop() {
+
+ // if (millis() - lastMillis > pump_interval) {
+ //   publishPumpState();
+ // }
+
   // Check if it's time to publish a message
   if (millis() - lastMillis > interval) {
     lastMillis = millis();
@@ -274,15 +291,15 @@ void loop() {
     distance = 0; // Replace invalid readings with 0
   }
     // Prints the distance on the Serial Monitor
-    Serial.print("Distance: ");
-    Serial.println(distance);
+  //  Serial.print("Distance: ");
+  //  Serial.println(distance);
 
     if (distance > 12) {
     distance = 12; // Replace invalid readings with 0
   }
     // Calcul procentaj umplere
     fill_percentage = map(distance, 0, 12, 100, 0);
-    Serial.println(fill_percentage);
+  //  Serial.println(fill_percentage);
     if (client.connected()) {
       // Publish message
        publishSoilMoisture();

@@ -21,6 +21,16 @@ import threading
 import time
 import json
 
+
+# Pentru gmail
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+
+
+
+
 # This sample uses the Message Broker for AWS IoT to send and receive messages
 # through an MQTT connection. On startup, the device connects to the server,
 # subscribes to a topic, and begins publishing messages to that topic.
@@ -69,6 +79,37 @@ pump_state='off'
 last_checked=0
 publish_count=0
 
+
+# for gmail
+threshold = 25
+time_delay = 60 * 5
+water_last_sent_time = 0
+soil_last_sent_time = 0
+
+def send_email(SUBJECT=None, BODY=None):
+    
+    sender_password = "juzo adpw ttqi kmme"
+
+    sender_email = "alexsoryn0@gmail.com"
+    recipient_email = "strategikon2001@gmail.com"
+    # subject = "Test Email from Python"
+    # body = "This is a test email sent using Python and Gmail's SMTP server."
+    
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = recipient_email
+    message["Subject"] = SUBJECT
+    message.attach(MIMEText(BODY, "plain"))
+    
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, recipient_email, message.as_string())
+            print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 # Callback when connection is accidentally lost.
 def on_connection_interrupted(connection, error, **kwargs):
     pass
@@ -106,8 +147,11 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
 
     global received_count
     
+    global water_last_sent_time
+    global soil_last_sent_time
+    global threshold
     
-    print("Received message from topic '{}': {}".format(topic, payload))
+    # print("Received message from topic '{}': {}".format(topic, payload))
     
     station = topic.split('/')[0]
     key = topic.split('/')[1]
@@ -120,10 +164,24 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     if 'Soil moisture humidity' in data:
         soil_moisture = data['Soil moisture humidity']
         value = soil_moisture
+        
+        if soil_moisture < threshold and (time.time() - soil_last_sent_time) >= time_delay:
+            subj = f"WATER LEVEL for {station} ALERT"
+            body = f"Water level is very low!! \n \n Details: \n\n station: {station} \n key: {key} \n value: {float(value)} \n timestamp: {last_checked} \n \n Please take measures. \n\n Thank you."
+            
+            send_email(SUBJECT=subj, BODY=body)
+            soil_last_sent_time = time.time()
 
     if 'Water level' in data:
         water_level = data['Water level']
         value = water_level
+        
+        if water_level < threshold and (time.time() - water_last_sent_time) >= time_delay:
+            subj = f"WATER LEVEL for {station} ALERT"
+            body = f"Water level is very low!! \n \n Details: \n\n station: {station} \n key: {key} \n value: {float(value)} \n timestamp: {last_checked} \n \n Please take measures. \n\n Thank you."
+            
+            send_email(SUBJECT=subj, BODY=body)
+            water_last_sent_time = time.time()
     
     if 'Time' in data:
         last_checked = data['Time']
@@ -150,11 +208,10 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
             "timestamp": last_checked
         }]
     
-        print(f"value={value}")
-        print(f"se adauga {db_data}")
-    
         write_api.write(BUCKET, ORGANIZATION, db_data)
 
+    
+    # send a notification if is the case
     
 
 # Callback when the connection successfully connects
@@ -184,7 +241,7 @@ def subscribe(topic):
 
 def publish(message, topic):
     global publish_count
-    print(f"Publishing message to topic '{topic}': {message}")
+    # print(f"Publishing message to topic '{topic}': {message}")
     # message_json = json.dumps(message)
     mqtt_connection.publish(
                 topic=PUBLISH_TOPIC,
@@ -229,7 +286,7 @@ def control_pump():
 @app.route("/api/data", methods=["GET"])
 def get_current_data():
     global last_checked
-    print(f"PUMP STATE {pump_state}")
+   # print(f"PUMP STATE {pump_state}")
     return jsonify({"soil_moisture": soil_moisture, "water_level": water_level,
                     "pump_state": pump_state, "last_checked": last_checked},
                    ), 200
@@ -277,24 +334,8 @@ if __name__ == '__main__':
     subscribe(SUBSCRIBE_TOPIC_3)
 
     
-    app.run(host="0.0.0.0", port=6000, debug=True)
+    app.run(host="0.0.0.0", port=6000, debug=False)
     
-    
-    # Publish message to server desired number of times.
-    # This step is skipped if message is blank.
-    # This step loops forever if count was set to 0.
-    
-    if MESSAGE:
-        if message_count == 0:
-            print("Sending messages until program killed")
-        else:
-            print("Sending {} message(s)".format(message_count))
-
-        publish_count = 1
-        while (publish_count <= message_count) or (message_count == 0):
-            publish(MESSAGE, PUBLISH_TOPIC)
-            publish_count += 1
-
     # Wait for all messages to be received.
     # This waits forever if count was set to 0.
     if message_count != 0 and not received_all_event.is_set():

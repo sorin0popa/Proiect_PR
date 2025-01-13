@@ -133,15 +133,15 @@ iframe {
     grid-template-columns: 1fr 1fr; /* 2 coloane */
     grid-gap: 0px;
     width: 100%;
-    height: 60vh;
+    height:56vh;
 }
 
-/* Containerul care va organiza tabelurile pe o matrice 1x2 */
-.tables {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 coloane */
-    grid-gap: 0px;
-    width: 100%;
-    height: 60vh;
+
+.table {
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    height: 500px;
 }
+
 
