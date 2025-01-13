@@ -1,0 +1,144 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 2,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Avg {_start_avg_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_current_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_min_value=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _start_second_join=\"2025-01-03 18:35:47.0678941 +0000 UTC\", _stop_avg_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_current_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_min_value=\"2025-01-05 18:35:47.0678941 +0000 UTC\", _stop_second_join=\"2025-01-05 18:35:47.0678941 +0000 UTC\", station=\"RPi_1\"}"
+          }
+        ]
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "query": "current_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \n  |> group(columns: [\"key\", \"station\"])\n  |> last()\n  |> rename(columns: {\"_value\": \"Current\"})\n\nmin_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \n  |> group(columns: [\"key\", \"station\"])\n  |> min()\n  |> rename(columns: {\"_value\": \"Min\"})\n\nmax_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \n  |> group(columns: [\"key\", \"station\"])\n  |> max()\n  |> rename(columns: {\"_value\": \"Max\"})\n\navg_value = from(bucket: \"my-bucket\")\n  |> range(start: -48h)\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \n  |> group(columns: [\"key\", \"station\"])\n  |> mean()\n  |> rename(columns: {\"_value\": \"Avg\"})\n\nfirst_join = join(\n  tables: {current_value, min_value},\n  on: [\"key\", \"station\"],\n  method: \"inner\"\n)\n \nsecond_join = join(\n  tables: {first_join, max_value},\n  on: [\"key\", \"station\"],\n  method: \"inner\"\n)\n\nthird_join = join(\n  tables: {second_join, avg_value},\n  on: [\"key\", \"station\"],\n  method: \"inner\"\n)\n\n\nresult = third_join\n  |> map(fn: (r) => ({\n    r with\n    Station: r.station\n  }))\n\nfinal_result = result\n  |> keep(columns: [\"Station\",\"Current\", \"Min\", \"Max\", \"Avg\"])\n  |> yield(name: \"final_result\")\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Water Level Stats",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {
+              "Avg": 4,
+              "Current": 1,
+              "Max": 3,
+              "Min": 2,
+              "Station": 0
+            },
+            "renameByName": {
+              "Station": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "1s",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1s",
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Battery Dashboard",
+  "uid": "ce93hyfkugc8wb",
+  "version": 1,
+  "weekStart": ""
+}

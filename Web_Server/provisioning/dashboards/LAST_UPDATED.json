@@ -18,7 +18,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 3,
+    "id": 7,
     "links": [],
     "panels": [
       {
@@ -32,18 +32,16 @@
               "mode": "thresholds"
             },
             "mappings": [],
-            "max": 100,
-            "min": 0,
             "thresholds": {
-              "mode": "percentage",
+              "mode": "absolute",
               "steps": [
                 {
-                  "color": "dark-red",
+                  "color": "green",
                   "value": null
                 },
                 {
-                  "color": "dark-blue",
-                  "value": 25
+                  "color": "dark-orange",
+                  "value": 80
                 }
               ]
             }
@@ -58,19 +56,21 @@
         },
         "id": 1,
         "options": {
-          "minVizHeight": 75,
-          "minVizWidth": 75,
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
           "orientation": "auto",
+          "percentChangeColorMode": "standard",
           "reduceOptions": {
             "calcs": [
               "lastNotNull"
             ],
-            "fields": "",
+            "fields": "/^Time$/",
             "values": false
           },
-          "showThresholdLabels": true,
-          "showThresholdMarkers": true,
-          "sizing": "auto"
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
         },
         "pluginVersion": "11.4.0",
         "targets": [
@@ -79,12 +79,12 @@
               "type": "influxdb",
               "uid": "P951FEA4DE68E13C5"
             },
-            "query": "from(bucket: \"my-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\")\r\n  |> last()",
+            "query": "from(bucket: \"my-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r[\"key\"] == \"stare_pompa\")\r\n  |> keep(columns: [\"_time\", \"_value\", \"key\"]) \r\n  |> last()",
             "refId": "A"
           }
         ],
-        "title": "CURRENT WATER LEVEL",
-        "type": "gauge"
+        "title": "LAST UPDATED",
+        "type": "stat"
       }
     ],
     "preload": false,
@@ -114,8 +114,8 @@
       ]
     },
     "timezone": "browser",
-    "title": "CURRENT WATER LEVEL",
-    "uid": "de9tgisp2e6tce",
+    "title": "CURRENT TIME",
+    "uid": "ae9thjbdd0ykgd",
     "version": 2,
     "weekStart": ""
   }

@@ -18,7 +18,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 3,
+    "id": 6,
     "links": [],
     "panels": [
       {
@@ -31,19 +31,29 @@
             "color": {
               "mode": "thresholds"
             },
-            "mappings": [],
-            "max": 100,
-            "min": 0,
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "color": "dark-red",
+                    "index": 0,
+                    "text": "OFF"
+                  },
+                  "1": {
+                    "color": "dark-green",
+                    "index": 1,
+                    "text": "ON"
+                  }
+                },
+                "type": "value"
+              }
+            ],
             "thresholds": {
-              "mode": "percentage",
+              "mode": "absolute",
               "steps": [
                 {
-                  "color": "dark-red",
+                  "color": "green",
                   "value": null
-                },
-                {
-                  "color": "dark-blue",
-                  "value": 25
                 }
               ]
             }
@@ -58,9 +68,11 @@
         },
         "id": 1,
         "options": {
-          "minVizHeight": 75,
-          "minVizWidth": 75,
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
           "orientation": "auto",
+          "percentChangeColorMode": "standard",
           "reduceOptions": {
             "calcs": [
               "lastNotNull"
@@ -68,9 +80,9 @@
             "fields": "",
             "values": false
           },
-          "showThresholdLabels": true,
-          "showThresholdMarkers": true,
-          "sizing": "auto"
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
         },
         "pluginVersion": "11.4.0",
         "targets": [
@@ -79,12 +91,12 @@
               "type": "influxdb",
               "uid": "P951FEA4DE68E13C5"
             },
-            "query": "from(bucket: \"my-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\")\r\n  |> last()",
+            "query": "from(bucket: \"my-bucket\")\r\n  |> range(start: -5m)\r\n  |> filter(fn: (r) => r[\"key\"] == \"stare_pompa\")\r\n  |> keep(columns: [\"_time\", \"_measurement\", \"_value\"])\r\n\r\n\r\n",
             "refId": "A"
           }
         ],
-        "title": "CURRENT WATER LEVEL",
-        "type": "gauge"
+        "title": "PUMP STATE",
+        "type": "stat"
       }
     ],
     "preload": false,
@@ -114,8 +126,8 @@
       ]
     },
     "timezone": "browser",
-    "title": "CURRENT WATER LEVEL",
-    "uid": "de9tgisp2e6tce",
+    "title": "PUMP STATE",
+    "uid": "de9th694mo3y8e",
     "version": 2,
     "weekStart": ""
   }

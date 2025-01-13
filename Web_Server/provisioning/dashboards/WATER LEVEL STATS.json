@@ -1,0 +1,140 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 10,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "current_value = from(bucket: \"my-bucket\")\r\n  |> range(start: -48h)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \r\n  |> group(columns: [\"key\", \"station\"])\r\n  |> last()\r\n  |> rename(columns: {\"_value\": \"Current\"})\r\n\r\nmin_value = from(bucket: \"my-bucket\")\r\n  |> range(start: -48h)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \r\n  |> group(columns: [\"key\", \"station\"])\r\n  |> min()\r\n  |> rename(columns: {\"_value\": \"Min\"})\r\n\r\nmax_value = from(bucket: \"my-bucket\")\r\n  |> range(start: -48h)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \r\n  |> group(columns: [\"key\", \"station\"])\r\n  |> max()\r\n  |> rename(columns: {\"_value\": \"Max\"})\r\n\r\navg_value = from(bucket: \"my-bucket\")\r\n  |> range(start: -48h)\r\n  |> filter(fn: (r) => r[\"key\"] == \"nivel_apa\") \r\n  |> group(columns: [\"key\", \"station\"])\r\n  |> mean()\r\n  |> rename(columns: {\"_value\": \"Avg\"})\r\n\r\nfirst_join = join(\r\n  tables: {current_value, min_value},\r\n  on: [\"key\", \"station\"],\r\n  method: \"inner\"\r\n)\r\n \r\nsecond_join = join(\r\n  tables: {first_join, max_value},\r\n  on: [\"key\", \"station\"],\r\n  method: \"inner\"\r\n)\r\n\r\nthird_join = join(\r\n  tables: {second_join, avg_value},\r\n  on: [\"key\", \"station\"],\r\n  method: \"inner\"\r\n)\r\n\r\n\r\nresult = third_join\r\n  |> map(fn: (r) => ({\r\n    r with\r\n    Station: r.station\r\n  }))\r\n\r\nfinal_result = result\r\n  |> keep(columns: [\"Station\",\"Current\", \"Min\", \"Max\", \"Avg\"])\r\n  |> yield(name: \"final_result\")\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "WATER LEVEL STATS",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {
+              "Avg": 1,
+              "Current": 2,
+              "Max": 3,
+              "Min": 4,
+              "Station": 0
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "refresh": "1s",
+  "schemaVersion": 40,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1s",
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "WATER LEVEL STATS",
+  "uid": "fe9tm5f75u70gf",
+  "version": 2,
+  "weekStart": ""
+}

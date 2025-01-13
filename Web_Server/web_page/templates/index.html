@@ -12,10 +12,10 @@
     </div>
  
     <div class="iframe-container" style="margin-top: 72px">
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=4&__feature.dashboardSceneSolo" width="450" height="300" frameborder="0" title="soil-moisture"></iframe>
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=3&__feature.dashboardSceneSolo" width="450" height="300" frameborder="0" title="current-soil-moisture"></iframe>
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=1&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0"></iframe>
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=2&__feature.dashboardSceneSolo" width="450" height="300" frameborder="0" title="current-water-level"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/72d5a2e5392c4fbebcfdc5a6ae6748ab" width="450" height="500" frameborder="0" title="soil-moisture"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/9f7d90b8382a45d8a245e2d523eaa9f0" width="450" height="500" frameborder="0" title="current-soil-moisture"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/45091f51cfcb4692b1db63e246aa1142" width="450" height="500" frameborder="0"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/e2b0a48a07164497832251993cf6f223" width="450" height="500" frameborder="0" title="current-water-level"></iframe>
     </div>
 
     <div style="margin-top: 80px; font-size: 32px;">
@@ -25,14 +25,20 @@
         <button onclick="controlPump('start_pump')">START</button>
         <button onclick="controlPump('stop_pump')">STOP</button>
     </div>
-    <div class="pump_info" style="font-size: 32px;">
-        <h3> <span id="pump_state">Pump state: Loading...</h3>
-        <h3> <span id="last_checked">Last update: Loading...</h3>
+
+    <div class="pump_info_container" style="margin-top: 72px">
+        <iframe src="http://localhost:3000/public-dashboards/2dcd1230ec264a5488a75bd5a8ede5f4" width="450" height="300" frameborder="0"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/91b3c4f540c34897b321d47641afdaeb" width="450" height="300" frameborder="0"></iframe> 
+        
     </div>
 
-    <div class="pump_info_container">
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=5&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0"></iframe>
-        <iframe src="http://localhost:3000/d-solo/fe9kh6u9cg5j4f/proiect-pr?orgId=1&timezone=browser&refresh=5s&panelId=6&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0"></iframe> 
+    <div style="margin-top: 80px; font-size: 32px;">
+        <h1>Statistics</h1>
+    </div>    
+
+    <div class="tables" style="margin-top: 72px">
+        <iframe src="http://localhost:3000/public-dashboards/552e87d8b3f84009b43ba5ccb4265724" width="450" height="300" frameborder="0"></iframe>
+        <iframe src="http://localhost:3000/public-dashboards/5324d2b6559a488987906a6e31062093" width="450" height="300" frameborder="0"></iframe> 
         
     </div>
 
@@ -94,12 +100,6 @@
                 .then(response => response.json())
                 .then(data => {
                     // document.getElementById("pump_info").innerText = `${data.pump_state}`;
-                    if (data.pump_state === 'on') {
-                        document.getElementById("pump_state").innerText = 'The pump is: ON';
-                    } else {
-                        document.getElementById("pump_state").innerText = 'The pump is: OFF';
-                    }
-                    document.getElementById("last_checked").innerText = `${data.last_checked}`;
                     setWaterFillPercentage(data.water_level);
                     setSoilFillPercentage(data.soil_moisture);
                 })
