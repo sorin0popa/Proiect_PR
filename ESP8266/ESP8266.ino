@@ -17,11 +17,11 @@ float value;
 float fill_percentage;
 
 // WiFi credentials
-// const char WIFI_SSID[] = "DESKTOP-DCI13GV 0351";
-// const char WIFI_PASSWORD[] = "B870d|65";
+const char WIFI_SSID[] = "DESKTOP-DCI13GV 0351";
+const char WIFI_PASSWORD[] = "B870d|65";
 
-const char WIFI_SSID[] = "Nimic's A55";
-const char WIFI_PASSWORD[] = "alex1111";
+// const char WIFI_SSID[] = "Nimic's A55";
+// const char WIFI_PASSWORD[] = "alex1111";
 
 
 // Device name from AWS

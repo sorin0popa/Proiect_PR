@@ -30,7 +30,6 @@
     <div class="pump_info_container" style="margin-top: 72px">
         <iframe src="http://localhost:3000/public-dashboards/2dcd1230ec264a5488a75bd5a8ede5f4" width="450" height="150" frameborder="0"></iframe>
         <iframe src="http://localhost:3000/public-dashboards/91b3c4f540c34897b321d47641afdaeb" width="450" height="150" frameborder="0"></iframe> 
-        
     </div>
 
     <div style="margin-top: 80px; font-size: 32px;">
@@ -40,7 +39,6 @@
     <div class="table" style="margin-top: 72px">
         <iframe src="http://localhost:3000/public-dashboards/552e87d8b3f84009b43ba5ccb4265724" width="450" height="300" frameborder="0" class="table"></iframe>
         <iframe src="http://localhost:3000/public-dashboards/5324d2b6559a488987906a6e31062093" width="450" height="300" frameborder="0" class="table"></iframe> 
-        
     </div>
 
     <script>
@@ -67,45 +65,6 @@
                 alert("Pump stop request...");
                 }
         }
-
-        // Procentajul de umplere
-        function setWaterFillPercentage(percent) {
-            const fillElement = document.getElementById('waterFill');
-            const percentageElement = document.getElementById('waterPercentage');
-
-            // Limitează procentajul între 0 și 100
-            percent = Math.max(0, Math.min(100, percent));
-
-            // Actualizează înălțimea și textul
-            fillElement.style.height = percent + '%';
-            percentageElement.innerText = percent + '%';
-        }
-
-        function setSoilFillPercentage(percent) {
-            const fillElement = document.getElementById('soilFill');
-            const percentageElement = document.getElementById('soilPercentage');
-
-            // Limitează procentajul între 0 și 100
-            percent = Math.max(0, Math.min(100, percent));
-
-            // Actualizează înălțimea și textul
-            fillElement.style.height = percent + '%';
-            percentageElement.innerText = percent + '%';
-        }
-
-    
-        // Actualizează valorile senzorilor la fiecare 5 secunde
-        // setInterval(() => {
-        //    fetch('/api/data')
-        //        .then(response => response.json())
-         //       .then(data => {
-                    // document.getElementById("pump_info").innerText = `${data.pump_state}`;
-        //            setWaterFillPercentage(data.water_level);
-        //            setSoilFillPercentage(data.soil_moisture);
-        //        })
-        //        .catch(error => console.error('Error:', error));
-        //}, 5000);
-        
     </script>
 </body>
 </html>
