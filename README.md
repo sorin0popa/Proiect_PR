@@ -76,6 +76,27 @@ Datele se transmit sub formă de json:
 }
 ```
 
+# Structură:
+* ESP8266: codul scris pentru ESP8266
+* Folderul Web_Server:
+    * web_page/templates/index.html: pagina principală
+    * web_page/static/style.css: aspectul obiectelor din pagină
+    * provisioning -> folder-ul pentru configurările Grafana 
+    * docker-compose.yml -> fișierul yml pentru pornirea micro-serviciilor care rulează in 
+backend
+    * grafana.ini -> alt fișier de configurare pentru Grafana 
+    * run.sh si stop.sh -> fișiere de pornire si deschidere a întregii aplicații
+* Folderul AWS_IOT_CERTIFICATES: păstrarea certificatelor necesare conectării la AWS
+
+
+# Pornirea aplicației web
+  Se ruleaza scriptul run.sh din Web_Server:
+```
+sudo docker compose -f docker-compose.yml up --build -d
+cd ./web_page
+python3 main.py
+```
+
 # Referințe
 1. https://youtu.be/xZoeJ-osS3g?si=Lw8lMLNcilYTrPPt  – How to Connect Esp8266 to aws IoT Core - (2024)
 2. https://github.com/aws/aws-iot-device-sdk-python-v2/blob/main/samples/pubsub.py  - AWS SDK Python
