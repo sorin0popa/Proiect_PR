@@ -42,7 +42,6 @@ services:
   # https://grafana.com/docs/grafana/latest/datasources/influxdb/configure-influxdb-data-source/
 
 
-# volumes for mapping data,config and log
 volumes:
   influxdb-data:
   grafana-data:

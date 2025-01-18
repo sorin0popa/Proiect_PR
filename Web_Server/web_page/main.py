@@ -18,7 +18,7 @@ import time
 import json
 
 
-# Pentru gmail
+# Gmail notification
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -63,7 +63,7 @@ last_checked=0
 publish_count=0
 
 
-# for gmail
+# Gmail
 threshold = 25
 time_delay = 60 * 5
 water_last_sent_time = 0
@@ -95,7 +95,7 @@ def send_email(SUBJECT=None, BODY=None):
 
 
 # Callback when the subscribed topic receives a message
-def on_message_received(topic, payload, dup, qos, retain, **kwargs):
+def on_message_received(topic, payload):
     global soil_moisture
     global water_level
     global last_checked
@@ -107,8 +107,6 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     global soil_last_sent_time
     global threshold
     
-    # print("Received message from topic '{}': {}".format(topic, payload))
-    
     station = topic.split('/')[0]
     key = topic.split('/')[1]
     value = 0.0
@@ -116,6 +114,8 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     received_count += 1
     
     data = json.loads(payload)
+    
+    # send emails if needed
     
     if 'Soil moisture humidity' in data:
         soil_moisture = data['Soil moisture humidity']
@@ -166,9 +166,6 @@ def on_message_received(topic, payload, dup, qos, retain, **kwargs):
     
         write_api.write(BUCKET, ORGANIZATION, db_data)
 
-    
-    # send a notification if is the case
-    
 
 # Callback when a connection attempt fails
 def on_connection_failure(connection, callback_data):
@@ -200,7 +197,7 @@ def publish(message, topic):
     time.sleep(1)
     publish_count += 1
 
-# Ruta principala pentru vizualizare date
+# Route for data visualization
 @app.route("/")
 def index():
     
@@ -208,7 +205,7 @@ def index():
                             last_checked=last_checked)
 
 
-# Ruta pentru control manual (ex. pornire pompa)
+# Route for pump activation / deactivation
 @app.route("/api/control", methods=["POST"])
 def control_pump():
     global pump_state
@@ -244,7 +241,7 @@ def get_current_data():
 if __name__ == '__main__':
     proxy_options = None
     
-    # Create a MQTT connection from the command line data
+    # MQTT Connection
     mqtt_connection = mqtt_connection_builder.mtls_from_path(
         endpoint=ENDPOINT,
         port=8883,
@@ -258,7 +255,6 @@ if __name__ == '__main__':
         on_connection_failure=on_connection_failure,
         on_connection_closed=on_connection_closed)
 
-    #if not cmdData.input_is_ci:
     print("Connecting to endpoint with client ID")
     connect_future = mqtt_connection.connect()
 
