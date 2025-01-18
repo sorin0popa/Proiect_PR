@@ -31,7 +31,33 @@ mqtt_connection = mqtt_connection_builder.mtls_from_path(
         on_connection_failure=on_connection_failure,
         on_connection_closed=on_connection_closed)
 ```
+## Dispozitivul IoT
+```
+ // Connect to NTP server to set time
+  NTPConnect();
 
+  // Set CA and client certificate for secure communication
+  net.setTrustAnchors(&cert);
+  net.setClientRSACert(&client_crt, &key);
+
+  // Connect MQTT client to AWS IoT Core
+  client.setServer(MQTT_HOST, 8883);
+  client.setCallback(messageReceived);
+
+  Serial.println("Connecting to AWS IoT");
+
+  // Attempt to connect to AWS IoT Core
+  while (!client.connect(THINGNAME)) {
+    Serial.print(".");
+    delay(1000);
+  }
+
+  // Check if connection is successful
+  if (!client.connected()) {
+    Serial.println("AWS IoT Timeout!");
+    return;
+  }
+```
 
 # Referințe
 1. https://youtu.be/xZoeJ-osS3g?si=Lw8lMLNcilYTrPPt  – How to Connect Esp8266 to aws IoT Core - (2024)
