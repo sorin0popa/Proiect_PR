@@ -1,12 +1,20 @@
-# Sistem de udare automatizata a plantelor
+# Sistem de udare automatizată a plantelor
 
-  Sistemul IoT pune la dispozitia utilizatorului in timp real informații despre nivelul de 
-umiditate din sol, nivelul apei din rezervorul din care se va uda solul, precum si starea pompei. 
-Acest proiect este destinat unui sistem de irigație automatizat pentru plante.
+  Sistem IoT pentru monitorizarea și controlul unui sistem de irigații, utilizând ESP8266, InfluxDB, Grafana și Flask.
 
+# Funcționalități principale
 
-# Structura
+  Monitorizarea în timp real a umidității solului și a nivelului apei din rezervor printr-o interfață web.
+  Control manual al pompei de apă.
+  Atât serverul web, cât și dispozitivele IoT comunică folosind protocolul MQTT, utilizând ca broker MQTT Amazon IoT Core.
 
+## Actuatori 
+ Aceasta va fi activata de clientul final care acceseaza interfata web si decide pe baza informatiilor 
+daca porneste sau opreste pompa
+
+## Senzori
+ Sunt integrați 2 senzori, care măsoară umiditatea solului și nivelul apei din rezervor 
+      
 
 
 # Referinte 
