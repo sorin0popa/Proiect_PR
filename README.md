@@ -60,8 +60,8 @@ mqtt_connection = mqtt_connection_builder.mtls_from_path(
 ```
 
 # Transmiterea datelor
+Datele se transmit sub formă de json:
 ```
-  Datele se transmit sub formă de json:
   void publishPumpState() {
   int waterPump = 1 - digitalRead(waterPump); // Citește starea pinului D3
 
