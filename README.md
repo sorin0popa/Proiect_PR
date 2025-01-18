@@ -8,9 +8,8 @@
  * Control manual al pompei de apă.
  * Atât serverul web, cât și dispozitivele IoT comunică folosind protocolul MQTT, utilizând ca broker MQTT Amazon IoT Core.
 
-## Actuatori 
- Aceasta va fi activata de clientul final care acceseaza interfata web si decide pe baza informatiilor 
-daca porneste sau opreste pompa
+## Actuatori
+  Pompa de apă
 
 ## Senzori
  Sunt integrați 2 senzori, care măsoară umiditatea solului și nivelul apei din rezervor 
