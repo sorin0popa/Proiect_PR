@@ -59,6 +59,23 @@ mqtt_connection = mqtt_connection_builder.mtls_from_path(
   }
 ```
 
+# Transmiterea datelor
+```
+  Datele se transmit sub formă de json:
+  void publishPumpState() {
+  int waterPump = 1 - digitalRead(waterPump); // Citește starea pinului D3
+
+  StaticJsonDocument<200> doc;
+  doc["Time"] = getFormattedTime();
+  doc["Pump state"] = 1 - digitalRead(waterPump);
+
+  char jsonBuffer[200];
+  serializeJson(doc, jsonBuffer);
+
+  client.publish(AWS_IOT_PUBLISH_TOPIC3, jsonBuffer);
+}
+```
+
 # Referințe
 1. https://youtu.be/xZoeJ-osS3g?si=Lw8lMLNcilYTrPPt  – How to Connect Esp8266 to aws IoT Core - (2024)
 2. https://github.com/aws/aws-iot-device-sdk-python-v2/blob/main/samples/pubsub.py  - AWS SDK Python
