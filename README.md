@@ -13,7 +13,24 @@
 
 ## Senzori
  Sunt integrați 2 senzori, care măsoară umiditatea solului și nivelul apei din rezervor 
-      
+
+ # Conectarea la AWS IoT Core
+ ## Server web
+  Se realizează conexiunea MQTT:
+```
+mqtt_connection = mqtt_connection_builder.mtls_from_path(
+        endpoint=ENDPOINT,
+        port=8883,
+        cert_filepath=CLIENT_CERT,
+        pri_key_filepath=PRIVATE_KEY,
+        ca_filepath=CA_CERT,
+        client_id=CLIENT_ID,
+        clean_session=False,
+        keep_alive_secs=60,
+        http_proxy_options=proxy_options,
+        on_connection_failure=on_connection_failure,
+        on_connection_closed=on_connection_closed)
+```
 
 
 # Referințe
