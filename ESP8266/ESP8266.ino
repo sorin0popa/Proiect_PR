@@ -157,6 +157,8 @@ void publishSoilMoisture() {
   char *time = getFormattedTime();
   StaticJsonDocument<200> doc;
   doc["Time"] = getFormattedTime();
+
+  Serial.println(value);
   doc["Soil moisture humidity"] = value;
 
   char jsonBuffer[200];

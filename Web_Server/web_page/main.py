@@ -96,11 +96,6 @@ def send_email(SUBJECT=None, BODY=None):
 
 # Callback when the subscribed topic receives a message
 def on_message_received(topic, payload):
-    global soil_moisture
-    global water_level
-    global last_checked
-    global pump_state
-
     global received_count
     
     global water_last_sent_time
@@ -139,15 +134,11 @@ def on_message_received(topic, payload):
             send_email(SUBJECT=subj, BODY=body)
             water_last_sent_time = time.time()
     
-    if 'Time' in data:
-        last_checked = data['Time']
-    
+
     if 'Pump state' in data:
         if data['Pump state'] == 1:
-            pump_state = 'on'
             value = 1
         else:
-            pump_state = 'off'
             value = 0
     
     if isinstance(value, float) == True or isinstance(value, int) == True:
@@ -201,8 +192,7 @@ def publish(message, topic):
 @app.route("/")
 def index():
     
-    return render_template("index.html", soil_moisture=soil_moisture, water_level=water_level, pump_state=pump_state,
-                            last_checked=last_checked)
+    return render_template("index.html")
 
 
 # Route for pump activation / deactivation
@@ -215,18 +205,12 @@ def control_pump():
         message = "1"
         pump_state = 'on'
         publish(message, PUBLISH_TOPIC)
-        return jsonify({"soil_moisture": soil_moisture, "water_level": water_level,
-                    "pump_state": pump_state, "last_checked": last_checked,
-                    "status": "Pump activated."},
-                   ), 200
+        return jsonify({"status": "Pump activated."},), 200
     elif action == "stop_pump":
         message = "0"
         pump_state = 'off'
         publish(message, PUBLISH_TOPIC)
-        return jsonify({"soil_moisture": soil_moisture, "water_level": water_level,
-                    "pump_state": pump_state, "last_checked": last_checked,
-                    "status": "Pump stopped."},
-                    ), 200
+        return jsonify({"status": "Pump stopped."},), 200
     else:
         return jsonify({"status": "Invalid action"}), 400
 

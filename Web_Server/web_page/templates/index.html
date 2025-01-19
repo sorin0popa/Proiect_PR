@@ -50,14 +50,6 @@
                 },
                 body: JSON.stringify({ action: action })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.pump_state === 'on') {
-                    document.getElementById("pump_state").innerText = 'The pump is: Trying to start the pump...';
-            } else {
-                document.getElementById("pump_state").innerText = 'The pump is: Trying to stop the pump...';
-                }
-            })
             .catch(error => console.error('Error:', error));
             if (action === 'start_pump') {
                 alert("Pump start request...");
