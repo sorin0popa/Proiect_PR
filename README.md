@@ -101,3 +101,6 @@ python3 main.py
 1. https://youtu.be/xZoeJ-osS3g?si=Lw8lMLNcilYTrPPt  – How to Connect Esp8266 to aws IoT Core - (2024)
 2. https://github.com/aws/aws-iot-device-sdk-python-v2/blob/main/samples/pubsub.py  - AWS SDK Python
 3. https://community.grafana.com/t/how-to-change-refresh-rate-from-5s-to-1s/39008 - Rata de refresh de la 5 la 1 secundă 
+
+# Link Youtube
+https://youtube.com/shorts/iXqsYpC61Eo 
