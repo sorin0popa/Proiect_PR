@@ -96,6 +96,7 @@ sudo docker compose -f docker-compose.yml up --build -d
 cd ./web_page
 python3 main.py
 ```
+  Aplicația merge pe portul 6000.
 
 # Referințe
 1. https://youtu.be/xZoeJ-osS3g?si=Lw8lMLNcilYTrPPt  – How to Connect Esp8266 to aws IoT Core - (2024)
