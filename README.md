@@ -102,5 +102,8 @@ python3 main.py
 2. https://github.com/aws/aws-iot-device-sdk-python-v2/blob/main/samples/pubsub.py  - AWS SDK Python
 3. https://community.grafana.com/t/how-to-change-refresh-rate-from-5s-to-1s/39008 - Rata de refresh de la 5 la 1 secundă 
 
-# Link Youtube
+# Linkuri Youtube
+https://www.youtube.com/watch?v=TkbamuZ6mdU
+
+## SHORTS
 https://youtube.com/shorts/iXqsYpC61Eo 
